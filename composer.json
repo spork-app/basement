@@ -1,0 +1,20 @@
+{
+    "name": "spork/basement",
+    "description": "A Spork Plugin",
+    "type": "library",
+    "license": "MIT",
+    "authors": [],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Spork\\Basement\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Spork\\Basement\\SporkServiceProvider"
+            ]
+        }
+    }
+}
