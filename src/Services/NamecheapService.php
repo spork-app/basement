@@ -74,7 +74,11 @@ class NamecheapService
         ]));
 
         $domainResponse = json_decode(json_encode(simplexml_load_string($response->body())));
-        try {
+        if (isset($domainResponse->Errors->Error)) {
+            throw new \Exception($domainResponse->Errors->Error);
+        }
+
+         try {
             return $domainResponse->CommandResponse->DomainDNSGetListResult->Nameserver;
         } catch (\Throwable $e) {
             dd($domainResponse);
@@ -89,13 +93,19 @@ class NamecheapService
             'ApiUser' => $this->apiUser,
             'ApiKey' => $this->apiKey,
             'UserName' => $this->username,
-            'Command' => 'namecheap.domains.dns.getList',
+            'Command' => 'namecheap.domains.dns.setCustom',
             'ClientIp' => $this->clientIp,
             'SLD' => $domainPart,
             'TLD' => $tld,
-            'Nameservers' => $this->nameservers,
+            'Nameservers' => implode(',', $nameservers),
         ]));
 
-        return explode(',', $this->nameservers);
+        $domainResponse = json_decode(json_encode(simplexml_load_string($response->body())));
+
+        if (isset($domainResponse->Errors->Error)) {
+            throw new \Exception($domainResponse->Errors->Error);
+        }
+
+        return $nameservers;
     }
 }

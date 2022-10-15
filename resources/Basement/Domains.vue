@@ -3,8 +3,8 @@
         <crud-view
             title="Domains"
             singular="Domain"
-            @index="(pageAndLimit) => $store.dispatch('getDomains', pageAndLimit)"
-            @execute="onExecute"
+            @index="async (pageAndLimit) => await $store.dispatch('getDomains', pageAndLimit)"
+            @execute="open = true"
             :data="$store.getters.domains"
             :paginator="$store.getters.domainPaginator"
         >
@@ -19,7 +19,6 @@
                             <svg v-if="data.is_auto_renewing" class="text-green-500 dark:text-green-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <svg v-else class="text-red-500 dark:text-red-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             {{data.is_auto_renewing? 'will auto renew':'wont auto renew'}}
-                            :form="form"
                         </div>
                         <div class="flex gap-1 items-center">
                             <svg v-if="!data.is_expired" class="text-green-500 dark:text-green-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -49,45 +48,78 @@
 
             <template #no-data>No domains in your greenhouse</template>
         </crud-view>
+        <Modal :open="open" @close="() => open = false">
+            <div class="dark:text-gray-200">
+                <div v-for="(values, index) in form">
+                    <div>
+                        <label :for="index" class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{index}}</label>
+                        <div class="relative mt-1 rounded-md shadow-sm">
+                          <spork-input v-model="form[index]" type="text" :name="index" :id="index" :class="[]" aria-invalid="true" aria-describedby="email-error" />
+                          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                          </div>
+                        </div>
+                        <p v-for="e in (errors[index] ?? {})" class="mt-2 text-sm text-red-600 dark:text-red-400">{{e}}</p>
+                    </div>
+                </div>
+
+                <div>
+
+                    <spork-button primary large>
+                        Save
+                    </spork-button>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
-<!-- 
-I want to build a real time dashboard for my greenhouse.
-I'll assume that the server will need to listen on an MQTT topic for the data.
-And this website will need it to be converted to websocket.
--->
 <script>
+import Modal from '@system/core/resources/components/Modal';
+import SporkButton from '@system/core/resources/components/SporkButton';
 export default {
     data() {
         return {
-        }
+            form: {
+                domains: [],
+                nameservers: '',
+            },
+            errors: null,
+            open: false,
+        };
     },
     methods: {
         date(value) {
-            return dayjs(value).format('LLL');
+            return dayjs(value).format("LLL");
         },
         hasErrors(error) {
             if (!this.form.errors) {
-                return '';
+                return "";
             }
-
             return this.form.errors[error];
         },
-        async onExecute({ actionToRun, selectedItems}) {
-            try {
-                await this.$store.dispatch('executeAction', {
-                    url: actionToRun.url,
-                    data: {
-                        domains: selectedItems.map(item => item.id)
-                    },
-                });
-                Spork.toast('Success! Running action...');
+        async executeAction({ actionToRun, selectedItems }) {
+            this.form.domains = selectedItems.map(item => item.domain);
 
+            try {
+                await this.$store.dispatch("executeAction", {
+                    url: actionToRun.url,
+                    data: this.form,
+                });
+                Spork.toast("Success! Running action...");
+                this.$store.dispatch("getDomains", { page: 1, limit: 100 });
             } catch (e) {
-                Spork.toast(e.message, 'error');
+                if (e.response && e.response.status === 422 && !e.response.data.errors.domains) {
+                    this.errors = e.response.data.errors;
+                } else if (e?.response?.data?.errors?.domains) {
+                    Spork.toast('Please select at least 1 domain', 'error')
+                } else {
+                    Spork.toast(e.message, "error");
+                }
+                console.log(e.message, e.response);
             }
         },
-    }
+    },
+    components: { Modal, SporkButton }
 }
 </script>
 
