@@ -5,13 +5,13 @@ namespace Spork\Basement\Actions;
 use Spork\Basement\Services\NamecheapService;
 use Spork\Core\Contracts\ActionInterface;
 
-class SyncNamecheapDNSAction implements ActionInterface 
+class SyncNamecheapDNSAction implements ActionInterface
 {
     public function __invoke(NamecheapService $service)
     {
         request()->validate([
             'domains' => 'required|array',
-            'nameservers' => 'required'
+            'nameservers' => 'required',
         ]);
 
         $domains = request()->get('domains');
@@ -21,6 +21,7 @@ class SyncNamecheapDNSAction implements ActionInterface
         foreach ($domains as $domain) {
             $service->updateDomainNs($domain, $nameservers);
         }
+
         return 'OK';
     }
 
@@ -38,7 +39,7 @@ class SyncNamecheapDNSAction implements ActionInterface
     {
         return [
             'basement',
-            'domains'
+            'domains',
         ];
     }
 }

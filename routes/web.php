@@ -7,14 +7,14 @@ use Spork\Basement\Services\NamecheapService;
 
 Route::get('link-server', function () {
     return view('basement::link-server', [
-        'user' => auth()->id()
-     ]);
+        'user' => auth()->id(),
+    ]);
 });
- 
+
 Route::get('link', function () {
     return 'value';
 })->name('servers.create-no-credential');
 
-Route::get('domains/namecheap', function(NamecheapService $service) {
+Route::get('domains/namecheap', function (NamecheapService $service) {
     return $service->getDomains(100, 1);
 });

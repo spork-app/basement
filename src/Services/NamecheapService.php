@@ -5,23 +5,24 @@ namespace Spork\Basement\Services;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;
+
 // This service is meant to update namecheap domains to use cloudflare servers
-class NamecheapService 
+class NamecheapService
 {
     public const NAMECHEAP_URL = 'https://api.namecheap.com/xml.response';
-    
+
     public function __construct(
         public string $apiUser,
         public string $apiKey,
         public string $username,
         public string $clientIp,
         public string $nameservers
-    ){
+    ) {
     }
 
     public function getDomains(int $limit = 10, int $page = 1)
     {
-        $response = Http::get(static::NAMECHEAP_URL . '?'. http_build_query([
+        $response = Http::get(static::NAMECHEAP_URL.'?'.http_build_query([
             'ApiUser' => $this->apiUser,
             'ApiKey' => $this->apiKey,
             'UserName' => $this->username,
@@ -40,7 +41,7 @@ class NamecheapService
         $domains = array_map(fn ($obj) => $obj->{'@attributes'}, $domainResponse->CommandResponse->DomainGetListResult->Domain ?? []);
 
         return new LengthAwarePaginator(
-            array_map(fn($domain) => [
+            array_map(fn ($domain) => [
                 'id' => (int) $domain->ID,
                 'domain' => $domain->Name,
                 'is_expired' => $domain->IsExpired === 'true',
@@ -63,7 +64,7 @@ class NamecheapService
     {
         [$domainPart, $tld] = explode('.', $domain);
 
-        $response = Http::get(static::NAMECHEAP_URL . '?'. http_build_query([
+        $response = Http::get(static::NAMECHEAP_URL.'?'.http_build_query([
             'ApiUser' => $this->apiUser,
             'ApiKey' => $this->apiKey,
             'UserName' => $this->username,
@@ -78,7 +79,7 @@ class NamecheapService
             throw new \Exception($domainResponse->Errors->Error);
         }
 
-         try {
+        try {
             return $domainResponse->CommandResponse->DomainDNSGetListResult->Nameserver;
         } catch (\Throwable $e) {
             dd($domainResponse);
@@ -89,7 +90,7 @@ class NamecheapService
     {
         [$domainPart, $tld] = explode('.', $domain);
 
-        $response = Http::get(static::NAMECHEAP_URL . '?'. http_build_query([
+        $response = Http::get(static::NAMECHEAP_URL.'?'.http_build_query([
             'ApiUser' => $this->apiUser,
             'ApiKey' => $this->apiKey,
             'UserName' => $this->username,
