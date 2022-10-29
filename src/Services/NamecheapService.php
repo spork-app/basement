@@ -2,7 +2,6 @@
 
 namespace Spork\Basement\Services;
 
-use Spork\Basement\Contracts\Services\DomainServiceContract;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;
@@ -119,9 +118,8 @@ class NamecheapService implements NamecheapDomainServiceContract
         return $nameservers;
     }
 
-    public function getDns(string $domain, string $type = 'A', int $limit = 10, int $page =1): LengthAwarePaginator
+    public function getDns(string $domain, string $type = 'A', int $limit = 10, int $page = 1): LengthAwarePaginator
     {
-
     }
 
     public function deleteDnsRecord(string $domain, string $dnsRecordId): void

@@ -8,9 +8,7 @@ class CloudflareRepository
 {
     public function __construct(
         public CloudflareDomainServiceContract $service
-    )
-    {
-
+    ) {
     }
 
     public function removeEmailRelatedDns()
@@ -35,6 +33,5 @@ class CloudflareRepository
         // types: development_mode,email_obfuscation,always_use_https,hotlink_protection,minify,polish,http2,automatic_https_rewrites,
         // PATCH zones/:zone_identifier/settings/:type
         // body: {"value": "on"}
-
     }
 }

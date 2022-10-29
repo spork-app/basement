@@ -14,7 +14,6 @@ class CloudflareDomainService implements CloudflareDomainServiceContract
         public string $apiKey,
         public string $email
     ) {
-
     }
 
     public function getDomains(int $limit = 10, int $page = 1): LengthAwarePaginator
@@ -26,7 +25,7 @@ class CloudflareDomainService implements CloudflareDomainServiceContract
             'per_page' => $limit,
             'page' => $page,
             'status' => 'active',
-            'match' => 'all'
+            'match' => 'all',
         ]);
 
         $data = $response->json();
@@ -56,7 +55,7 @@ class CloudflareDomainService implements CloudflareDomainServiceContract
         // TODO: Implement updateDomainNs() method.
     }
 
-    public function getDns(string $domain, ?string $type = null, int $limit = 10, int $page =1): LengthAwarePaginator
+    public function getDns(string $domain, ?string $type = null, int $limit = 10, int $page = 1): LengthAwarePaginator
     {
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$this->apiKey,
@@ -77,8 +76,8 @@ class CloudflareDomainService implements CloudflareDomainServiceContract
             'Authorization' => 'Bearer '.$this->apiKey,
             'x-auth-email' => $this->email,
         ])->post(static::CLOUDFLARE_URL."/zones/$domain/dns_records", $dnsRecordArray);
-
     }
+
     public function hasEmailRouting(string $domain): bool
     {
         $response = Http::withHeaders([

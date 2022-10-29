@@ -3,11 +3,10 @@
 namespace Spork\Basement\Tests\Feature;
 
 use Illuminate\Pagination\LengthAwarePaginator;
-use Spork\Basement\Contracts\Services\DomainServiceContract;
-use Spork\Basement\Contracts\Services\NamecheapDomainServiceContract;
-use Spork\Basement\Tests\TestCase;
-use Spork\Basement\Services\NamecheapService;
 use Mockery;
+use Spork\Basement\Contracts\Services\NamecheapDomainServiceContract;
+use Spork\Basement\Services\NamecheapService;
+use Spork\Basement\Tests\TestCase;
 
 class DomainsFeatureTest extends TestCase
 {
@@ -15,7 +14,7 @@ class DomainsFeatureTest extends TestCase
     {
         $mockService = Mockery::mock(NamecheapService::class);
 
-        $this->app->bind(NamecheapDomainServiceContract::class, fn() => $mockService);
+        $this->app->bind(NamecheapDomainServiceContract::class, fn () => $mockService);
 
         $this->app->when(NamecheapService::class)
             ->needs('$apiUser')
@@ -46,7 +45,7 @@ class DomainsFeatureTest extends TestCase
     {
         $mockService = Mockery::mock(NamecheapService::class);
 
-        $this->app->bind(NamecheapDomainServiceContract::class, fn() => $mockService);
+        $this->app->bind(NamecheapDomainServiceContract::class, fn () => $mockService);
 
         $this->app->when(NamecheapService::class)
             ->needs('$apiUser')

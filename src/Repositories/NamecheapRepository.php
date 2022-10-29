@@ -10,8 +10,7 @@ class NamecheapRepository
     public function __construct(
         public NamecheapDomainServiceContract $namecheapService,
         public CloudflareDomainServiceContract $cloudflareDomain
-    )
-    {
+    ) {
     }
 
     public function migrateAllDnsToCloudflare(array $dnsServers)

@@ -4,7 +4,6 @@ namespace Spork\Basement;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
-use Spork\Basement\Contracts\Services\DomainServiceContract;
 use Spork\Basement\Services\CloudflareDomainService;
 use Spork\Basement\Services\NamecheapService;
 use Spork\Core\Spork;
