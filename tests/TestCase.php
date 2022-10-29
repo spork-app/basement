@@ -17,6 +17,11 @@ class TestCase extends TestbenchTestCase
         );
     }
 
+    protected function tearDown(): void
+    {
+        \Mockery::close();
+    }
+
     protected function getPackageProviders($app)
     {
         return [

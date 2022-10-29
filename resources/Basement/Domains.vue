@@ -42,7 +42,7 @@
             <template #modal-title>Add to your greenhouse</template>
             <template #form>
                 <div class="flex flex-col gap-4 mt-2">
-                  
+
                 </div>
             </template>
 
@@ -64,7 +64,6 @@
                 </div>
 
                 <div>
-
                     <spork-button primary large>
                         Save
                     </spork-button>
@@ -74,8 +73,6 @@
     </div>
 </template>
 <script>
-import Modal from '@system/core/resources/components/Modal';
-import SporkButton from '@system/core/resources/components/SporkButton';
 export default {
     data() {
         return {
@@ -118,8 +115,7 @@ export default {
                 console.log(e.message, e.response);
             }
         },
-    },
-    components: { Modal, SporkButton }
+    }
 }
 </script>
 

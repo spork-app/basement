@@ -1,20 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Spork\Basement\Services\NamecheapService;
+use Spork\Basement\Contracts\Services\NamecheapDomainServiceContract;
 
 // Route::get('/', 'Controller@method');
 
-Route::get('link-server', function () {
-    return view('basement::link-server', [
-        'user' => auth()->id(),
-    ]);
-});
-
-Route::get('link', function () {
-    return 'value';
-})->name('servers.create-no-credential');
-
-Route::get('domains/namecheap', function (NamecheapService $service) {
-    return $service->getDomains(100, 1);
+Route::get('domains/namecheap', function (NamecheapDomainServiceContract $service) {
+    return $service->getDomains(
+        request()->get('limit', 100),
+        request()->get('page', 1)
+    );
 });

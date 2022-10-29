@@ -2,12 +2,13 @@
 
 namespace Spork\Basement\Services;
 
+use Spork\Basement\Contracts\Services\DomainServiceContract;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;
+use Spork\Basement\Contracts\Services\NamecheapDomainServiceContract;
 
-// This service is meant to update namecheap domains to use cloudflare servers
-class NamecheapService
+class NamecheapService implements NamecheapDomainServiceContract
 {
     public const NAMECHEAP_URL = 'https://api.namecheap.com/xml.response';
 
@@ -20,7 +21,7 @@ class NamecheapService
     ) {
     }
 
-    public function getDomains(int $limit = 10, int $page = 1)
+    public function getDomains(int $limit = 10, int $page = 1): LengthAwarePaginator
     {
         $response = Http::get(static::NAMECHEAP_URL.'?'.http_build_query([
             'ApiUser' => $this->apiUser,
@@ -32,7 +33,9 @@ class NamecheapService
             'Page' => $page,
         ]));
 
-        $domainResponse = json_decode(json_encode(simplexml_load_string($response->body())));
+        $domainResponse = json_decode(json_encode(simplexml_load_string($xmlDebugResponse = $response->body())));
+
+        file_put_contents('namecheap.domains.getList.error.xml', $xmlDebugResponse);
 
         if (isset($domainResponse->Errors->Error)) {
             throw new \Exception($domainResponse->Errors->Error);
@@ -60,7 +63,7 @@ class NamecheapService
         );
     }
 
-    public function getDomainNs(string $domain)
+    public function getDomainNs(string $domain): array
     {
         [$domainPart, $tld] = explode('.', $domain);
 
@@ -74,7 +77,12 @@ class NamecheapService
             'TLD' => $tld,
         ]));
 
-        $domainResponse = json_decode(json_encode(simplexml_load_string($response->body())));
+        $xmlDebugResponse = $response->body();
+
+        $domainResponse = json_decode(json_encode(simplexml_load_string($xmlDebugResponse)));
+
+        file_put_contents('namecheap.domains.dns.getList.error.xml', $xmlDebugResponse);
+
         if (isset($domainResponse->Errors->Error)) {
             throw new \Exception($domainResponse->Errors->Error);
         }
@@ -86,7 +94,7 @@ class NamecheapService
         }
     }
 
-    public function updateDomainNs(string $domain, array $nameservers)
+    public function updateDomainNs(string $domain, array $nameservers): array
     {
         [$domainPart, $tld] = explode('.', $domain);
 
@@ -101,12 +109,28 @@ class NamecheapService
             'Nameservers' => implode(',', $nameservers),
         ]));
 
-        $domainResponse = json_decode(json_encode(simplexml_load_string($response->body())));
+        $domainResponse = json_decode(json_encode(simplexml_load_string($xmlDebugResponse = $response->body())));
 
+        file_put_contents('namecheap.domains.getList', $xmlDebugResponse);
         if (isset($domainResponse->Errors->Error)) {
             throw new \Exception($domainResponse->Errors->Error);
         }
 
         return $nameservers;
+    }
+
+    public function getDns(string $domain, string $type = 'A', int $limit = 10, int $page =1): LengthAwarePaginator
+    {
+
+    }
+
+    public function deleteDnsRecord(string $domain, string $dnsRecordId): void
+    {
+        // TODO: Implement deleteDnsRecord() method.
+    }
+
+    public function createDnsRecord(string $domain, array $dnsRecordArray): void
+    {
+        // TODO: Implement createDnsRecord() method.
     }
 }

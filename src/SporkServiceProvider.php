@@ -4,6 +4,8 @@ namespace Spork\Basement;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Spork\Basement\Contracts\Services\DomainServiceContract;
+use Spork\Basement\Services\CloudflareDomainService;
 use Spork\Basement\Services\NamecheapService;
 use Spork\Core\Spork;
 
@@ -19,7 +21,9 @@ class SporkServiceProvider extends RouteServiceProvider
         Spork::addFeature('Basement', 'ServerIcon', '/basement', 'tool', ['domains']);
         Spork::actions('Basement', __DIR__.'/Actions');
 
-        if (config('spork.basement.enabled')) {
+        $this->mergeConfigFrom(__DIR__.'/../config/basement.php', 'spork.basement');
+
+        if (config('spork.basement.enabled', false)) {
             Route::middleware($this->app->make('config')->get('spork.basement.middleware', ['auth:sanctum']))
                 ->prefix('/api/basement')
                 ->group(__DIR__.'/../routes/web.php');
@@ -40,5 +44,13 @@ class SporkServiceProvider extends RouteServiceProvider
         $this->app->when(NamecheapService::class)
             ->needs('$nameservers')
             ->give($this->app->make('config')->get('services.namecheap.nameservers'));
+
+        $this->app->when(CloudflareDomainService::class)
+            ->needs('$apiKey')
+            ->give($this->app->make('config')->get('services.cloudflare.apiKey'));
+
+        $this->app->when(CloudflareDomainService::class)
+            ->needs('$email')
+            ->give($this->app->make('config')->get('services.cloudflare.email'));
     }
 }

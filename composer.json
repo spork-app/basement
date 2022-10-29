@@ -10,11 +10,13 @@
         }
     ],
     "require": {
-        "php": ">=8.0"
+        "php": ">=8.0",
+        "spork/core": "^1.0"
     },
     "autoload": {
         "psr-4": {
-            "Spork\\Basement\\": "src/"
+            "Spork\\Basement\\": "src/",
+            "Spork\\Basement\\Tests\\": "tests/"
         }
     },
     "extra": {
@@ -30,7 +32,9 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "^7.0"
+        "orchestra/testbench": "^7.0",
+        "guzzlehttp/guzzle": "^7.5",
+        "mockery/mockery": "^1.5"
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
